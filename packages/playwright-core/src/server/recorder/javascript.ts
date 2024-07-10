@@ -160,12 +160,12 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
     formatter.add(`
       import { test, expect${options.deviceName ? ', devices' : ''} } from '@playwright/test';
 ${useText ? '\ntest.use(' + useText + ');\n' : ''}
-      test('test', async ({ page }) => {`);
+      `);
     return formatter.format();
   }
 
   generateTestFooter(saveStorage: string | undefined): string {
-    return `});`;
+    return ``;
   }
 
   generateStandaloneHeader(options: LanguageGeneratorOptions): string {
