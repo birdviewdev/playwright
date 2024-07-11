@@ -811,7 +811,7 @@ class Overlay {
 
     this._nextTest = this._recorder.document.createElement('x-pw-tool-item');
     this._nextTest.title = 'NextTest';
-    this._nextTest.classList.add('record');
+    this._nextTest.classList.add('plus');
     this._nextTest.appendChild(this._recorder.document.createElement('x-div'));
     toolsListElement.appendChild(this._nextTest);
 
