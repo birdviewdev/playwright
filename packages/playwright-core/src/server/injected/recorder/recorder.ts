@@ -762,6 +762,7 @@ class Overlay {
   private _assertVisibilityToggle: HTMLElement;
   private _assertTextToggle: HTMLElement;
   private _assertValuesToggle: HTMLElement;
+  private _nextTest: HTMLElement;
   private _offsetX = 0;
   private _dragState: { offsetX: number, dragStart: { x: number, y: number } } | undefined;
   private _measure: { width: number, height: number } = { width: 0, height: 0 };
@@ -808,6 +809,12 @@ class Overlay {
     this._assertValuesToggle.appendChild(this._recorder.document.createElement('x-div'));
     toolsListElement.appendChild(this._assertValuesToggle);
 
+    this._nextTest = this._recorder.document.createElement('x-pw-tool-item');
+    this._nextTest.title = 'NextTest';
+    this._nextTest.classList.add('record');
+    this._nextTest.appendChild(this._recorder.document.createElement('x-div'));
+    toolsListElement.appendChild(this._nextTest);
+
     this._updateVisualPosition();
     this._refreshListeners();
   }
@@ -845,6 +852,12 @@ class Overlay {
       addEventListener(this._assertValuesToggle, 'click', () => {
         if (!this._assertValuesToggle.classList.contains('disabled'))
           this._recorder.delegate.setMode?.(this._recorder.state.mode === 'assertingValue' ? 'recording' : 'assertingValue');
+      }),
+
+      addEventListener(this._nextTest, 'click', () => {
+          this._recorder.delegate.performAction?.(
+            {name: 'newTest', signals: []}
+          )
       }),
     ];
   }

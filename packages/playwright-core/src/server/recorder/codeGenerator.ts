@@ -74,7 +74,7 @@ export class CodeGenerator extends EventEmitter {
     if (this._currentAction === action)
       this._currentAction = null;
   }
-
+  
   didPerformAction(actionInContext: ActionInContext) {
     if (!this._enabled)
       return;

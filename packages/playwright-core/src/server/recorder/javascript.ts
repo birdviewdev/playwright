@@ -76,7 +76,7 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
       formatter.add(`const download${signals.download.downloadAlias}Promise = ${pageAlias}.waitForEvent('download');`);
 
     formatter.add(this._generateActionCall(subject, action));
-
+    
     if (signals.popup)
       formatter.add(`const ${signals.popup.popupAlias} = await ${signals.popup.popupAlias}Promise;`);
     if (signals.download)
@@ -134,6 +134,9 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
       case 'assertValue': {
         const assertion = action.value ? `toHaveValue(${quote(action.value)})` : `toBeEmpty()`;
         return `${this._isTest ? '' : '// '}await expect(${subject}.${this._asLocator(action.selector)}).${assertion};`;
+      }
+      case 'newTest': {
+        return `test('${Math.random()}', ({page})=>{})`
       }
     }
   }
