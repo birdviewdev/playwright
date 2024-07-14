@@ -23,11 +23,9 @@ import { toClickOptions, toModifiers } from './recorder/utils';
 import { Page } from './page';
 import { Frame } from './frames';
 import { BrowserContext } from './browserContext';
-import { JavaLanguageGenerator } from './recorder/java';
 import { JavaScriptLanguageGenerator } from './recorder/javascript';
-import { JsonlLanguageGenerator } from './recorder/jsonl';
-import { CSharpLanguageGenerator } from './recorder/csharp';
-import { PythonLanguageGenerator } from './recorder/python';
+import { JsonLanguageGenerator } from './recorder/json';
+
 import * as recorderSource from '../generated/recorderSource';
 import * as consoleApiSource from '../generated/consoleApiSource';
 import { EmptyRecorderApp } from './recorder/recorderApp';
@@ -433,7 +431,7 @@ class ContextRecorder extends EventEmitter {
 
   setOutput(codegenId: string, outputFile?: string) {
     const languages = new Set([
-      new JsonlLanguageGenerator(),
+      new JsonLanguageGenerator(),
       new JavaScriptLanguageGenerator(/* isPlaywrightTest */false),
       new JavaScriptLanguageGenerator(/* isPlaywrightTest */true),
     ]);
