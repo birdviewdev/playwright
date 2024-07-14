@@ -817,6 +817,13 @@ class Overlay {
 
     this._updateVisualPosition();
     this._refreshListeners();
+
+    document.addEventListener('keydown', (event)=> {
+      if (event.altKey && event.key === 'r') {
+        event.preventDefault();
+        this._recorder.delegate.setMode?.(this._recorder.state.mode === 'none' || this._recorder.state.mode === 'standby' || this._recorder.state.mode === 'inspecting' ? 'recording' : 'standby');
+    }
+    })
   }
 
   private _refreshListeners() {
