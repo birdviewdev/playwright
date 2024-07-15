@@ -168,7 +168,7 @@ export class CodeGenerator extends EventEmitter {
         acc[acc.length - 1].push(languageGenerator.generateAction(target));
       }
       return acc;
-    }, [[]]).flatMap((v)=> [`test(()=>{`, ...v, `})`]).filter(Boolean)
+    }, [[]]).flatMap((v)=> [`test('${Math.random()}', async({page})=> {`, ...v, `})`]).filter(Boolean)
 
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };
