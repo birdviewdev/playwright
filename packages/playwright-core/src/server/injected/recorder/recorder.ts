@@ -819,10 +819,12 @@ class Overlay {
     this._refreshListeners();
 
     document.addEventListener('keydown', (event)=> {
-      if (event.altKey && event.key === 'r') {
-        event.preventDefault();
+      event.preventDefault();
+      if (event.metaKey && event.shiftKey && event.key === 'r') {
         this._recorder.delegate.setMode?.(this._recorder.state.mode === 'none' || this._recorder.state.mode === 'standby' || this._recorder.state.mode === 'inspecting' ? 'recording' : 'standby');
-    }
+      } else if(event.metaKey && event.shiftKey && event.key === 'v') {
+        this._recorder.delegate.setMode?.(this._recorder.state.mode === 'assertingVisibility' ? 'recording' : 'assertingVisibility');
+      }
     })
   }
 
