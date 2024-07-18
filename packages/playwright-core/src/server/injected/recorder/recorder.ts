@@ -23,6 +23,8 @@ import type { Highlight, HighlightOptions } from '../highlight';
 import clipPaths from './clipPaths';
 
 interface RecorderDelegate {
+  undoAction?(): Promise<void>
+  redoAction?(): Promise<void>
   performAction?(action: actions.Action): Promise<void>;
   recordAction?(action: actions.Action): Promise<void>;
   setSelector?(selector: string): Promise<void>;
@@ -763,6 +765,9 @@ class Overlay {
   private _assertTextToggle: HTMLElement;
   private _assertValuesToggle: HTMLElement;
   private _nextTest: HTMLElement;
+  private _undo: HTMLElement;
+  private _redo: HTMLElement;
+
   private _offsetX = 0;
   private _dragState: { offsetX: number, dragStart: { x: number, y: number } } | undefined;
   private _measure: { width: number, height: number } = { width: 0, height: 0 };
@@ -814,6 +819,19 @@ class Overlay {
     this._nextTest.classList.add('plus');
     this._nextTest.appendChild(this._recorder.document.createElement('x-div'));
     toolsListElement.appendChild(this._nextTest);
+
+    this._undo = this._recorder.document.createElement('x-pw-tool-item');
+    this._undo.title = 'Undo';
+    this._undo.classList.add('undo');
+    this._undo.appendChild(this._recorder.document.createElement('x-div'));
+    toolsListElement.appendChild(this._undo);
+
+    this._redo = this._recorder.document.createElement('x-pw-tool-item');
+    this._redo.title = 'Redo';
+    this._redo.classList.add('redo');
+    this._redo.appendChild(this._recorder.document.createElement('x-div'));
+    toolsListElement.appendChild(this._redo);
+
 
     this._updateVisualPosition();
     this._refreshListeners();
@@ -873,6 +891,14 @@ class Overlay {
           this._recorder.delegate.performAction?.(
             {name: 'newTest', signals: []}
           )
+      }),
+
+      addEventListener(this._undo, 'click', () => {
+        this._recorder.delegate.undoAction?.()
+      }),
+
+      addEventListener(this._redo, 'click', () => {
+        this._recorder.delegate.redoAction?.()
       }),
     ];
   }
@@ -1330,6 +1356,8 @@ function createSvgElement(doc: Document, { tagName, attrs, children }: SvgJson):
 interface Embedder {
   __pw_recorderPerformAction(action: actions.Action): Promise<void>;
   __pw_recorderRecordAction(action: actions.Action): Promise<void>;
+  __pw_recorderUndoAction(): Promise<void>
+  __pw_recorderRedoAction(): Promise<void>
   __pw_recorderState(): Promise<UIState>;
   __pw_recorderSetSelector(selector: string): Promise<void>;
   __pw_recorderSetMode(mode: Mode): Promise<void>;
@@ -1381,6 +1409,16 @@ export class PollingRecorder implements RecorderDelegate {
   async recordAction(action: actions.Action): Promise<void> {
     await this._embedder.__pw_recorderRecordAction(action);
   }
+
+  async undoAction(): Promise<void> {
+    await this._embedder.__pw_recorderUndoAction();
+  }
+
+
+  async redoAction(): Promise<void> {
+    await this._embedder.__pw_recorderRedoAction();
+  }
+
 
   async setSelector(selector: string): Promise<void> {
     await this._embedder.__pw_recorderSetSelector(selector);

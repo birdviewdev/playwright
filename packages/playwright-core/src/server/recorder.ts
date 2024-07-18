@@ -471,6 +471,14 @@ class ContextRecorder extends EventEmitter {
           return this._recordAction(source.frame, action)
         });
 
+    await this._context.exposeBinding('__pw_recorderUndoAction', false,
+        () => this._undoAction()
+    );
+
+    await this._context.exposeBinding('__pw_recorderRedoAction', false,
+    () => this._redoAction()
+);
+
     await this._context.extendInjectedScript(recorderSource.source);
   }
 
@@ -645,6 +653,14 @@ class ContextRecorder extends EventEmitter {
       await perform('selectOption',{}, async ()=>{});
     }
     
+  }
+
+  private async _undoAction() {
+    return this._generator.undoAction()
+  }
+
+  private async _redoAction() {
+    return this._generator.redoAction();
   }
 
   private async _recordAction(frame: Frame, action: actions.Action) {
