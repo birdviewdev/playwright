@@ -23,11 +23,9 @@ import { toClickOptions, toModifiers } from './recorder/utils';
 import { Page } from './page';
 import { Frame } from './frames';
 import { BrowserContext } from './browserContext';
-import { JavaLanguageGenerator } from './recorder/java';
 import { JavaScriptLanguageGenerator } from './recorder/javascript';
-import { JsonlLanguageGenerator } from './recorder/jsonl';
-import { CSharpLanguageGenerator } from './recorder/csharp';
-import { PythonLanguageGenerator } from './recorder/python';
+import { JsonLanguageGenerator } from './recorder/json';
+
 import * as recorderSource from '../generated/recorderSource';
 import * as consoleApiSource from '../generated/consoleApiSource';
 import { EmptyRecorderApp } from './recorder/recorderApp';
@@ -433,17 +431,9 @@ class ContextRecorder extends EventEmitter {
 
   setOutput(codegenId: string, outputFile?: string) {
     const languages = new Set([
-      new JavaLanguageGenerator('junit'),
-      new JavaLanguageGenerator('library'),
+      new JsonLanguageGenerator(),
       new JavaScriptLanguageGenerator(/* isPlaywrightTest */false),
       new JavaScriptLanguageGenerator(/* isPlaywrightTest */true),
-      new PythonLanguageGenerator(/* isAsync */false, /* isPytest */true),
-      new PythonLanguageGenerator(/* isAsync */false, /* isPytest */false),
-      new PythonLanguageGenerator(/* isAsync */true,  /* isPytest */false),
-      new CSharpLanguageGenerator('mstest'),
-      new CSharpLanguageGenerator('nunit'),
-      new CSharpLanguageGenerator('library'),
-      new JsonlLanguageGenerator(),
     ]);
     const primaryLanguage = [...languages].find(l => l.id === codegenId);
     if (!primaryLanguage)
@@ -471,11 +461,15 @@ class ContextRecorder extends EventEmitter {
     // Input actions that potentially lead to navigation are intercepted on the page and are
     // performed by the Playwright.
     await this._context.exposeBinding('__pw_recorderPerformAction', false,
-        (source: BindingSource, action: actions.Action) => this._performAction(source.frame, action));
+        (source: BindingSource, action: actions.Action) => {
+          return this._performAction(source.frame, action) 
+        });
 
     // Other non-essential actions are simply being recorded.
     await this._context.exposeBinding('__pw_recorderRecordAction', false,
-        (source: BindingSource, action: actions.Action) => this._recordAction(source.frame, action));
+        (source: BindingSource, action: actions.Action) => {
+          return this._recordAction(source.frame, action)
+        });
 
     await this._context.extendInjectedScript(recorderSource.source);
   }
@@ -647,6 +641,10 @@ class ContextRecorder extends EventEmitter {
       const values = action.options.map(value => ({ value }));
       await perform('selectOption', { selector: action.selector, values }, callMetadata => frame.selectOption(callMetadata, action.selector, [], values, { timeout: kActionTimeout, strict: true }));
     }
+    if (action.name === 'newTest') {
+      await perform('selectOption',{}, async ()=>{});
+    }
+    
   }
 
   private async _recordAction(frame: Frame, action: actions.Action) {

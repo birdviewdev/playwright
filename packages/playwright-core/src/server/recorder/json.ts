@@ -18,9 +18,9 @@ import { asLocator } from '../../utils/isomorphic/locatorGenerators';
 import type { ActionInContext } from './codeGenerator';
 import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './language';
 
-export class JsonlLanguageGenerator implements LanguageGenerator {
+export class JsonLanguageGenerator implements LanguageGenerator {
   id = 'jsonl';
-  groupName = '';
+  groupName = 'raw';
   name = 'JSONL';
   highlighter = 'javascript' as Language;
 

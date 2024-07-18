@@ -74,7 +74,7 @@ export class CodeGenerator extends EventEmitter {
     if (this._currentAction === action)
       this._currentAction = null;
   }
-
+  
   didPerformAction(actionInContext: ActionInContext) {
     if (!this._enabled)
       return;
@@ -161,7 +161,15 @@ export class CodeGenerator extends EventEmitter {
   generateStructure(languageGenerator: LanguageGenerator) {
     const header = languageGenerator.generateHeader(this._options);
     const footer = languageGenerator.generateFooter(this._options.saveStorage);
-    const actions = this._actions.map(a => languageGenerator.generateAction(a)).filter(Boolean);
+    const actions = this._actions.reduce<string[][]>((acc, target) => {
+      if (target.action.name === 'newTest') {
+        acc.push([]);
+      } else {
+        acc[acc.length - 1].push(languageGenerator.generateAction(target));
+      }
+      return acc;
+    }, [[]]).flatMap((v)=> [`test('${Math.random()}', async({page})=> {`, ...v, `})`]).filter(Boolean)
+
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };
   }

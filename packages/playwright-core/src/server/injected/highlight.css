@@ -200,6 +200,23 @@ x-pw-tool-item.record > x-div {
   clip-path: url(#icon-circle-large-filled);
 }
 
+
+x-pw-tool-item.plus.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.plus.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.plus.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.plus > x-div {
+  clip-path: url(#icon-plus);
+}
+
 x-pw-tool-item.pick-locator > x-div {
   /* codicon: inspect */
   clip-path: url(#icon-inspect);
