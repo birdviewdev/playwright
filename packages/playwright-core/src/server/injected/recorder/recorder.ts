@@ -1330,6 +1330,8 @@ function createSvgElement(doc: Document, { tagName, attrs, children }: SvgJson):
 interface Embedder {
   __pw_recorderPerformAction(action: actions.Action): Promise<void>;
   __pw_recorderRecordAction(action: actions.Action): Promise<void>;
+  __pw_recorderUndoAction(): Promise<void>
+  __pw_recorderRedoAction(): Promise<void>
   __pw_recorderState(): Promise<UIState>;
   __pw_recorderSetSelector(selector: string): Promise<void>;
   __pw_recorderSetMode(mode: Mode): Promise<void>;
@@ -1381,6 +1383,16 @@ export class PollingRecorder implements RecorderDelegate {
   async recordAction(action: actions.Action): Promise<void> {
     await this._embedder.__pw_recorderRecordAction(action);
   }
+
+  async undoAction(): Promise<void> {
+    await this._embedder.__pw_recorderUndoAction();
+  }
+
+
+  async redoAction(): Promise<void> {
+    await this._embedder.__pw_recorderRedoAction();
+  }
+
 
   async setSelector(selector: string): Promise<void> {
     await this._embedder.__pw_recorderSetSelector(selector);

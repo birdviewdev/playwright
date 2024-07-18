@@ -30,6 +30,7 @@ export class CodeGenerator extends EventEmitter {
   private _currentAction: ActionInContext | null = null;
   private _lastAction: ActionInContext | null = null;
   private _actions: ActionInContext[] = [];
+  private _actionHistories: ActionInContext[] = [];
   private _enabled: boolean;
   private _options: LanguageGeneratorOptions;
 
@@ -48,6 +49,7 @@ export class CodeGenerator extends EventEmitter {
     this._currentAction = null;
     this._lastAction = null;
     this._actions = [];
+    this._actionHistories = []
     this.emit('change');
   }
 
@@ -60,6 +62,20 @@ export class CodeGenerator extends EventEmitter {
       return;
     this.willPerformAction(action);
     this.didPerformAction(action);
+  }
+
+  undoAction() {
+    const action = this._actions.pop();
+    if(action) this._actionHistories.push(action);
+    this.emit('change');
+
+  }
+
+  redoAction() {
+    const action = this._actionHistories.pop();
+    if(action) this._actions.push(action);
+    this.emit('change');
+
   }
 
   willPerformAction(action: ActionInContext) {
@@ -107,9 +123,11 @@ export class CodeGenerator extends EventEmitter {
 
     this._lastAction = actionInContext;
     this._currentAction = null;
-    if (eraseLastAction)
+    if (eraseLastAction) {
       this._actions.pop();
+    }
     this._actions.push(actionInContext);
+    this._actionHistories = []
     this.emit('change');
   }
 
