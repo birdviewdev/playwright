@@ -200,7 +200,7 @@ x-pw-tool-item.record > x-div {
   clip-path: url(#icon-circle-large-filled);
 }
 
-
+/* plus **/
 x-pw-tool-item.plus.active {
   background-color: transparent;
 }
@@ -215,6 +215,40 @@ x-pw-tool-item.plus.active > x-div {
 
 x-pw-tool-item.plus > x-div {
   clip-path: url(#icon-plus);
+}
+
+/* undo **/
+x-pw-tool-item.undo.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.undo.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.undo.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.undo > x-div {
+  clip-path: url(#icon-undo);
+}
+
+/* redo **/
+x-pw-tool-item.redo.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.redo.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.redo.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.redo > x-div {
+  clip-path: url(#icon-redo);
 }
 
 x-pw-tool-item.pick-locator > x-div {
