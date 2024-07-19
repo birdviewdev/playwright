@@ -64,6 +64,13 @@ export class CodeGenerator extends EventEmitter {
     this.didPerformAction(action);
   }
 
+  changeAction() {
+    /**
+     * actions의 라인을 집는다.
+     * 해당 actions에 새로운 actions을 추가한다.
+     */
+  }
+
   undoAction() {
     const action = this._actions.pop();
     if(action) this._actionHistories.push(action);
@@ -75,7 +82,6 @@ export class CodeGenerator extends EventEmitter {
     const action = this._actionHistories.pop();
     if(action) this._actions.push(action);
     this.emit('change');
-
   }
 
   willPerformAction(action: ActionInContext) {
@@ -186,7 +192,8 @@ export class CodeGenerator extends EventEmitter {
         acc[acc.length - 1].push(languageGenerator.generateAction(target));
       }
       return acc;
-    }, [[]]).flatMap((v)=> [`test('${Math.random()}', async({page})=> {`, ...v, `})`]).filter(Boolean)
+      // testOpen, testClose 추가
+    }, [[]]).flatMap((v)=> [{}, ...v,{}]).filter(Boolean)
 
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };

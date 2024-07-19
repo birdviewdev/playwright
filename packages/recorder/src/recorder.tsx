@@ -168,7 +168,7 @@ export const Recorder: React.FC<RecorderProps> = ({
       <ToolbarButton icon='color-mode' title='Toggle color mode' toggled={false} onClick={() => toggleTheme()}></ToolbarButton>
     </Toolbar>
     <SplitView sidebarSize={200}>
-      <CodeMirrorWrapper text={source.text} language={source.language} highlight={source.highlight} revealLine={source.revealLine} readOnly={true} lineNumbers={true}/>
+      <CodeMirrorWrapper text={source.text} language={source.language} highlight={source.highlight} revealLine={source.revealLine} readOnly={false} lineNumbers={true}/>
       <TabbedPane
         rightToolbar={selectedTab === 'locator' ? [<ToolbarButton icon='files' title='Copy' onClick={() => copy(locator)} />] : []}
         tabs={[

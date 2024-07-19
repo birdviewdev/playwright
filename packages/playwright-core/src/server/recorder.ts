@@ -146,6 +146,17 @@ export class Recorder implements InstrumentationListener {
         this._contextRecorder.clearScript();
         return;
       }
+      /**
+       * 변경된 텍스트를 받는다.
+       * 변경된 라인을 받는다. 
+       * 이것이 유효한지 확인한다.
+       *  - 현재 액션과 라인이 일치하는지 확인한다.
+       *  - 수정된 텍스트가 유효한지 확인한다.
+       * 유효하다면 적절한 액션을 반환한다.
+       * 유효하지 않다면 ... 뭔가 조치를 취한다.
+       */
+
+      this._contextRecorder.changeAction()
     });
 
     await Promise.all([
@@ -661,6 +672,10 @@ class ContextRecorder extends EventEmitter {
 
   private async _redoAction() {
     return this._generator.redoAction();
+  }
+
+  async changeAction() {
+    return //
   }
 
   private async _recordAction(frame: Frame, action: actions.Action) {
