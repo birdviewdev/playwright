@@ -660,7 +660,7 @@ class ContextRecorder extends EventEmitter {
       const values = action.options.map(value => ({ value }));
       await perform('selectOption', { selector: action.selector, values }, callMetadata => frame.selectOption(callMetadata, action.selector, [], values, { timeout: kActionTimeout, strict: true }));
     }
-    if (action.name === 'newTest') {
+    if (action.name === 'openTest') {
       await perform('selectOption',{}, async ()=>{});
     }
     

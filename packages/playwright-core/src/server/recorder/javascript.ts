@@ -135,11 +135,11 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
         const assertion = action.value ? `toHaveValue(${quote(action.value)})` : `toBeEmpty()`;
         return `${this._isTest ? '' : '// '}await expect(${subject}.${this._asLocator(action.selector)}).${assertion};`;
       }
-      case 'testOpen': {
-        return ``
+      case 'openTest': {
+        return `test('${action.title}', async({ page })=> {`
       }
-      case 'testClose': {
-        return ``
+      case 'closeTest': {
+        return `});`
       }
     }
   }

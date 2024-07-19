@@ -185,15 +185,18 @@ export class CodeGenerator extends EventEmitter {
   generateStructure(languageGenerator: LanguageGenerator) {
     const header = languageGenerator.generateHeader(this._options);
     const footer = languageGenerator.generateFooter(this._options.saveStorage);
-    const actions = this._actions.reduce<string[][]>((acc, target) => {
-      if (target.action.name === 'newTest') {
-        acc.push([]);
+    const actions = this._actions.reduce<ActionInContext[][]>((acc, target) => {
+      if (target.action.name === 'openTest') {
+        acc.push([target]);
       } else {
-        acc[acc.length - 1].push(languageGenerator.generateAction(target));
+        acc[acc.length - 1].push(target);
       }
       return acc;
-      // testOpen, testClose 추가
-    }, [[]]).flatMap((v)=> [{}, ...v,{}]).filter(Boolean)
+      
+    }, [[]]).flatMap((v)=> v[0].action.name === 'openTest' ? [...v, {
+      frame: v[0].frame,
+      action: {name: 'closeTest', signals:[]}
+    } as ActionInContext]: v).map((v)=> languageGenerator.generateAction(v)).filter(Boolean)
 
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };

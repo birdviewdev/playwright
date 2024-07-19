@@ -35,6 +35,12 @@ export type Language =
   | "html"
   | "css";
 
+export type ChangeValue = {
+  text: string;
+  line: number;
+  lineText: string;
+};
+
 export interface SourceProps {
   text: string;
   language?: Language;
@@ -46,7 +52,7 @@ export interface SourceProps {
   isFocused?: boolean;
   focusOnChange?: boolean;
   wrapLines?: boolean;
-  onChange?: (text: string) => void;
+  onChange?: (value: ChangeValue) => void;
 }
 
 export const CodeMirrorWrapper: React.FC<SourceProps> = ({
@@ -202,8 +208,16 @@ export const CodeMirrorWrapper: React.FC<SourceProps> = ({
      * 수정중인 라인과 해당 라인의 값을 전달한다.
      */
     let changeListener: () => void | undefined;
+
     if (onChange) {
-      changeListener = () => onChange(codemirror.getValue());
+      changeListener = () => {
+        const cursor = codemirror.getCursor();
+        onChange({
+          text: codemirror.getValue(),
+          line: codemirror.lineCount(),
+          lineText: codemirror.getLine(cursor.line),
+        });
+      };
       codemirror.on("change", changeListener);
     }
 
