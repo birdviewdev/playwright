@@ -35,7 +35,7 @@ export type Language =
   | "html"
   | "css";
 
-export type ChangeValue = {
+export type EditValueState = {
   text: string;
   line: number;
   lineText: string;
@@ -52,7 +52,7 @@ export interface SourceProps {
   isFocused?: boolean;
   focusOnChange?: boolean;
   wrapLines?: boolean;
-  onChange?: (value: ChangeValue) => void;
+  onChange?: (valueState: EditValueState) => void;
 }
 
 export const CodeMirrorWrapper: React.FC<SourceProps> = ({

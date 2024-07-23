@@ -64,11 +64,10 @@ export class CodeGenerator extends EventEmitter {
     this.didPerformAction(action);
   }
 
-  changeAction() {
-    /**
-     * actions의 라인을 집는다.
-     * 해당 actions에 새로운 actions을 추가한다.
-     */
+  changeAction(actions: Action[]) {
+    // @ts-ignore
+    this._actions = actions.map((newAction)=> newAction.signals && newAction.name !== 'closeTest' ? ({frame: {pageAlias: newAction.pageAlias, isMainFrame: true}, action: newAction} ): null).filter(Boolean)
+    this.emit('change')
   }
 
   undoAction() {
@@ -197,7 +196,7 @@ export class CodeGenerator extends EventEmitter {
       frame: v[0].frame,
       action: {name: 'closeTest', signals:[]}
     } as ActionInContext]: v).map((v)=> languageGenerator.generateAction(v)).filter(Boolean)
-
+    
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };
   }

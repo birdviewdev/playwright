@@ -156,7 +156,12 @@ export class Recorder implements InstrumentationListener {
        * 유효하지 않다면 ... 뭔가 조치를 취한다.
        */
 
-      this._contextRecorder.changeAction()
+      if(data.event === 'edit') {
+        const rawActions = data.params.state.text
+        const newActions = rawActions.split('\n').filter(Boolean).map(JSON.parse)
+        this._contextRecorder.changeAction(newActions)
+      }
+
     });
 
     await Promise.all([
@@ -674,8 +679,8 @@ class ContextRecorder extends EventEmitter {
     return this._generator.redoAction();
   }
 
-  async changeAction() {
-    return //
+  async changeAction(actions: actions.Action[]) {
+    return this._generator.changeAction(actions);
   }
 
   private async _recordAction(frame: Frame, action: actions.Action) {

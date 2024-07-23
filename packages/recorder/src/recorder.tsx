@@ -16,8 +16,8 @@
 
 import type { CallLog, Mode, Source } from "./recorderTypes";
 import {
-  ChangeValue,
   CodeMirrorWrapper,
+  EditValueState,
 } from "@web/components/codeMirrorWrapper";
 import { SplitView } from "@web/components/splitView";
 import { TabbedPane } from "@web/components/tabbedPane";
@@ -51,6 +51,7 @@ export const Recorder: React.FC<RecorderProps> = ({
   log,
   mode,
 }) => {
+  const cmState = React.useRef<EditValueState>();
   const [fileId, setFileId] = React.useState<string | undefined>();
   const [selectedTab, setSelectedTab] = React.useState<string>("log");
 
@@ -118,8 +119,8 @@ export const Recorder: React.FC<RecorderProps> = ({
     [mode]
   );
 
-  const handleChange = (value: ChangeValue) => {
-    console.log(value);
+  const handleChange = (valueState: EditValueState) => {
+    cmState.current = valueState;
   };
 
   return (
@@ -232,26 +233,12 @@ export const Recorder: React.FC<RecorderProps> = ({
         ></ToolbarButton>
         <ToolbarButton
           icon="debug-continue"
-          title="Resume (F8)"
-          disabled={!paused}
+          title="save"
           onClick={() => {
-            window.dispatch({ event: "resume" });
-          }}
-        ></ToolbarButton>
-        <ToolbarButton
-          icon="debug-pause"
-          title="Pause (F8)"
-          disabled={paused}
-          onClick={() => {
-            window.dispatch({ event: "pause" });
-          }}
-        ></ToolbarButton>
-        <ToolbarButton
-          icon="debug-step-over"
-          title="Step over (F10)"
-          disabled={!paused}
-          onClick={() => {
-            window.dispatch({ event: "step" });
+            window.dispatch({
+              event: "edit",
+              params: { state: cmState.current },
+            });
           }}
         ></ToolbarButton>
         <div style={{ flex: "auto" }}></div>
@@ -315,9 +302,8 @@ export const Recorder: React.FC<RecorderProps> = ({
                 <CodeMirrorWrapper
                   text={locator}
                   language={source.language}
-                  readOnly={false}
+                  readOnly={true}
                   focusOnChange={true}
-                  onChange={onEditorChange}
                   wrapLines={true}
                 />
               ),
