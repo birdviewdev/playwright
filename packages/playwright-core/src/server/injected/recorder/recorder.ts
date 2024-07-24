@@ -846,7 +846,7 @@ class Overlay {
       } else if(event.key === '`') {
         event.preventDefault();
         this._recorder.delegate.performAction?.(
-          {name: 'newTest', signals: []}
+          {name: 'openTest', title:'', signals: []}
         )
       }
     })
@@ -889,7 +889,7 @@ class Overlay {
 
       addEventListener(this._nextTest, 'click', () => {
           this._recorder.delegate.performAction?.(
-            {name: 'newTest', signals: []}
+            {name: 'openTest', title:'', signals: []}
           )
       }),
 
