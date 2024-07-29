@@ -177,8 +177,24 @@ export class Recorder implements InstrumentationListener {
       
         const source = data.sources.find((source)=> source.id === 'jsonl')
 
-        this._pushAllSources();
-      this._recorderApp?.setCursor((source?.actions?.length || 0) - 1)
+      this._pushAllSources();
+
+
+      if(source?.actions) {
+        const lastAction = JSON.parse(source?.actions[source?.actions?.length - 1])
+        
+        
+        const headerLength = 1
+
+        let cursor = (source?.actions?.length || 1) + headerLength
+        if(lastAction.name === 'closeTest') {
+          cursor = cursor - 1;
+        }
+
+        this._contextRecorder._cursor = cursor
+        this._recorderApp?.setCursor(cursor)
+      }
+
       this._recorderApp?.setFileIfNeeded(data.primaryFileName);
     });
 
@@ -698,6 +714,7 @@ class ContextRecorder extends EventEmitter {
       action
     };
     this._setCommittedAfterTimeout(actionInContext);
+    console.log("record this._cursor::", this._cursor)
     this._generator.addAction(actionInContext, this._cursor);
   }
 
