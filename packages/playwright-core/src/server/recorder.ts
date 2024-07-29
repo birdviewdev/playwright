@@ -424,7 +424,7 @@ class ContextRecorder extends EventEmitter {
   private _throttledOutputFile: ThrottledFile | null = null;
   private _orderedLanguages: LanguageGenerator[] = [];
   private _listeners: RegisteredListener[] = [];
-  public _cursor: number = 1;
+  public _cursor: number = 0;
 
   constructor(context: BrowserContext, params: channels.BrowserContextRecorderSupplementEnableParams) {
     super();

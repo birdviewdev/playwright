@@ -71,6 +71,7 @@ export const Recorder: React.FC<RecorderProps> = ({
     highlight: [],
   };
 
+  const actionSource = sources.find((s) => s.id === "jsonl") as Source;
   const [locator, setLocator] = React.useState("");
   window.playwrightSetSelector = (selector: string, focus?: boolean) => {
     const language = source.language;
@@ -80,13 +81,20 @@ export const Recorder: React.FC<RecorderProps> = ({
 
   React.useEffect(() => {
     cursorTab.current?.classList.remove("cursor");
-
     cursorTab.current = Array.from(
       document.querySelectorAll(`.CodeMirror-linenumber.CodeMirror-gutter-elt`)
-    ).find((el) => el.textContent === String(cursor)) as HTMLElement;
-
+    ).findLast((el) => el.textContent === String(cursor)) as HTMLElement;
     cursorTab.current?.classList.add("cursor");
   }, [cursor]);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      window.dispatch({
+        event: "cursor",
+        params: { state: 2 },
+      });
+    }, 500);
+  }, []);
 
   window.playwrightSetFileIfNeeded = (value: string) => {
     const newSource = sources.find((s) => s.id === value);
@@ -122,6 +130,10 @@ export const Recorder: React.FC<RecorderProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [paused]);
 
+  const handleChange = (valueState: EditValueState) => {
+    cmState.current = valueState;
+  };
+
   const onEditorChange = React.useCallback(
     (selector: string) => {
       if (mode === "none")
@@ -131,17 +143,6 @@ export const Recorder: React.FC<RecorderProps> = ({
     },
     [mode]
   );
-
-  const handleChange = (valueState: EditValueState) => {
-    cmState.current = valueState;
-  };
-
-  // 커서 이동 툴바
-  // 커서 이동 함수
-  // 레코더에 이벤트 바꾸기
-  // 리액트 내부의 커서는 안바꿈 -> 단방향
-
-  // 커서 그림 그리기
 
   return (
     <div className="recorder">
@@ -312,56 +313,27 @@ export const Recorder: React.FC<RecorderProps> = ({
           onClick={() => toggleTheme()}
         ></ToolbarButton>
       </Toolbar>
-      <SplitView sidebarSize={200}>
+      <SplitView orientation="horizontal" sidebarSize={200}>
         <CodeMirrorWrapper
           text={source.text}
           onChange={handleChange}
           language={source.language}
           highlight={source.highlight}
           revealLine={source.revealLine}
-          readOnly={false}
+          readOnly={true}
           lineNumbers={true}
         />
-        <TabbedPane
-          rightToolbar={
-            selectedTab === "locator"
-              ? [
-                  <ToolbarButton
-                    icon="files"
-                    title="Copy"
-                    onClick={() => copy(locator)}
-                  />,
-                ]
-              : []
-          }
-          tabs={[
-            {
-              id: "locator",
-              title: "Locator",
-              render: () => (
-                <CodeMirrorWrapper
-                  text={locator}
-                  language={source.language}
-                  readOnly={true}
-                  focusOnChange={true}
-                  wrapLines={true}
-                />
-              ),
-            },
-            {
-              id: "log",
-              title: "Log",
-              render: () => (
-                <CallLogView
-                  language={source.language}
-                  log={Array.from(log.values())}
-                />
-              ),
-            },
-          ]}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
+        {actionSource && (
+          <CodeMirrorWrapper
+            text={actionSource.text}
+            onChange={handleChange}
+            language={actionSource.language}
+            highlight={actionSource.highlight}
+            revealLine={actionSource.revealLine}
+            readOnly={false}
+            lineNumbers={true}
+          />
+        )}
       </SplitView>
     </div>
   );
