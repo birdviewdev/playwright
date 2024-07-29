@@ -39,6 +39,7 @@ declare global {
 }
 
 export interface RecorderProps {
+  cursor: number;
   sources: Source[];
   paused: boolean;
   log: Map<string, CallLog>;
@@ -50,10 +51,12 @@ export const Recorder: React.FC<RecorderProps> = ({
   paused,
   log,
   mode,
+  cursor,
 }) => {
   const cmState = React.useRef<EditValueState>();
   const [fileId, setFileId] = React.useState<string | undefined>();
   const [selectedTab, setSelectedTab] = React.useState<string>("log");
+  const cursorTab = React.useRef<HTMLElement>();
 
   React.useEffect(() => {
     if (!fileId && sources.length > 0) setFileId(sources[0].id);
@@ -74,6 +77,16 @@ export const Recorder: React.FC<RecorderProps> = ({
     if (focus) setSelectedTab("locator");
     setLocator(asLocator(language, selector));
   };
+
+  React.useEffect(() => {
+    cursorTab.current?.classList.remove("cursor");
+
+    cursorTab.current = Array.from(
+      document.querySelectorAll(`.CodeMirror-linenumber.CodeMirror-gutter-elt`)
+    ).find((el) => el.textContent === String(cursor)) as HTMLElement;
+
+    cursorTab.current?.classList.add("cursor");
+  }, [cursor]);
 
   window.playwrightSetFileIfNeeded = (value: string) => {
     const newSource = sources.find((s) => s.id === value);
@@ -122,6 +135,13 @@ export const Recorder: React.FC<RecorderProps> = ({
   const handleChange = (valueState: EditValueState) => {
     cmState.current = valueState;
   };
+
+  // 커서 이동 툴바
+  // 커서 이동 함수
+  // 레코더에 이벤트 바꾸기
+  // 리액트 내부의 커서는 안바꿈 -> 단방향
+
+  // 커서 그림 그리기
 
   return (
     <div className="recorder">
@@ -232,8 +252,28 @@ export const Recorder: React.FC<RecorderProps> = ({
           }}
         ></ToolbarButton>
         <ToolbarButton
-          icon="debug-continue"
-          title="save"
+          icon="up-arrow"
+          title="Up-arrow"
+          onClick={() => {
+            window.dispatch({
+              event: "cursor",
+              params: { state: cursor - 1 },
+            });
+          }}
+        ></ToolbarButton>
+        <ToolbarButton
+          icon="down-arrow"
+          title="Down-arrow"
+          onClick={() => {
+            window.dispatch({
+              event: "cursor",
+              params: { state: cursor + 1 },
+            });
+          }}
+        ></ToolbarButton>
+        <ToolbarButton
+          icon="checkbox"
+          title="Checkbox"
           onClick={() => {
             window.dispatch({
               event: "edit",

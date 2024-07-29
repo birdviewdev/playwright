@@ -66,7 +66,10 @@ const iconNames = [
   'pass',
   'plus',
   'undo',
-  'redo'
+  'redo',
+  'up-arrow',
+  'down-arrow',
+  'checkbox'
 ];
 
 (async () => {

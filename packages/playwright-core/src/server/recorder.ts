@@ -146,28 +146,26 @@ export class Recorder implements InstrumentationListener {
         this._contextRecorder.clearScript();
         return;
       }
-      /**
-       * 변경된 텍스트를 받는다.
-       * 변경된 라인을 받는다. 
-       * 이것이 유효한지 확인한다.
-       *  - 현재 액션과 라인이 일치하는지 확인한다.
-       *  - 수정된 텍스트가 유효한지 확인한다.
-       * 유효하다면 적절한 액션을 반환한다.
-       * 유효하지 않다면 ... 뭔가 조치를 취한다.
-       */
+
+      if(data.event === 'cursor') {
+        this._contextRecorder._cursor = data.params.state
+        this._recorderApp?.setCursor(data.params.state)
+        return;
+      }
 
       if(data.event === 'edit') {
         const rawActions = data.params.state.text
         const newActions = rawActions.split('\n').filter(Boolean).map(JSON.parse)
+        
         this._contextRecorder.changeAction(newActions)
       }
-
     });
 
     await Promise.all([
       recorderApp.setMode(this._mode),
       recorderApp.setPaused(this._debugger.isPaused()),
-      this._pushAllSources()
+      this._pushAllSources(),
+      recorderApp.setCursor(this._contextRecorder._cursor)
     ]);
 
     this._context.once(BrowserContext.Events.Close, () => {
@@ -177,7 +175,31 @@ export class Recorder implements InstrumentationListener {
     });
     this._contextRecorder.on(ContextRecorder.Events.Change, (data: { sources: Source[], primaryFileName: string }) => {
       this._recorderSources = data.sources;
+      
+      
       this._pushAllSources();
+      
+      const source = data.sources.find((source)=> source.id === 'jsonl')
+
+      if(source?.actions&& source?.actions.length >= 2) {
+        const lastAction = JSON.parse(source?.actions[source?.actions?.length - 1])
+        const lastPrevAction = JSON.parse(source?.actions[source?.actions?.length - 2])
+
+        
+        const headerLength = 1
+
+        if(lastAction.name === 'closeTest' && lastPrevAction.name === 'openTest') {
+          let cursor = (source?.actions?.length || 1) + headerLength
+          cursor = cursor - 1;
+          this._contextRecorder._cursor = cursor
+          this._recorderApp?.setCursor(cursor)
+        } else {
+          this._contextRecorder._cursor = this._contextRecorder._cursor + 1
+          this._recorderApp?.setCursor(this._contextRecorder._cursor)
+        }
+
+      }
+
       this._recorderApp?.setFileIfNeeded(data.primaryFileName);
     });
 
@@ -351,6 +373,7 @@ export class Recorder implements InstrumentationListener {
     this._recorderApp?.setSources([...this._recorderSources, ...this._userSources.values()]);
   }
 
+
   async onBeforeInputAction(sdkObject: SdkObject, metadata: CallMetadata) {
   }
 
@@ -401,6 +424,7 @@ class ContextRecorder extends EventEmitter {
   private _throttledOutputFile: ThrottledFile | null = null;
   private _orderedLanguages: LanguageGenerator[] = [];
   private _listeners: RegisteredListener[] = [];
+  public _cursor: number = 1;
 
   constructor(context: BrowserContext, params: channels.BrowserContextRecorderSupplementEnableParams) {
     super();
@@ -520,7 +544,7 @@ class ContextRecorder extends EventEmitter {
           name: 'closePage',
           signals: [],
         }
-      });
+      }, this._cursor);
       this._pageAliases.delete(page);
     });
     frame.on(Frame.Events.InternalNavigation, event => {
@@ -543,7 +567,7 @@ class ContextRecorder extends EventEmitter {
           url: page.mainFrame().url(),
           signals: [],
         }
-      });
+      }, this._cursor);
     }
   }
 
@@ -644,7 +668,7 @@ class ContextRecorder extends EventEmitter {
       await frame.instrumentation.onAfterCall(frame, callMetadata);
 
       this._setCommittedAfterTimeout(actionInContext);
-      this._generator.didPerformAction(actionInContext);
+      this._generator.didPerformAction(actionInContext, this._cursor);
     };
 
     const kActionTimeout = 5000;
@@ -680,6 +704,7 @@ class ContextRecorder extends EventEmitter {
   }
 
   async changeAction(actions: actions.Action[]) {
+    this._cursor = actions.length - 1
     return this._generator.changeAction(actions);
   }
 
@@ -693,7 +718,7 @@ class ContextRecorder extends EventEmitter {
       action
     };
     this._setCommittedAfterTimeout(actionInContext);
-    this._generator.addAction(actionInContext);
+    this._generator.addAction(actionInContext, this._cursor);
   }
 
   private _setCommittedAfterTimeout(actionInContext: ActionInContext) {
@@ -707,25 +732,25 @@ class ContextRecorder extends EventEmitter {
 
   private _onFrameNavigated(frame: Frame, page: Page) {
     const pageAlias = this._pageAliases.get(page);
-    this._generator.signal(pageAlias!, frame, { name: 'navigation', url: frame.url() });
+    this._generator.signal(pageAlias!, frame, { name: 'navigation', url: frame.url() }, this._cursor);
   }
 
   private _onPopup(page: Page, popup: Page) {
     const pageAlias = this._pageAliases.get(page)!;
     const popupAlias = this._pageAliases.get(popup)!;
-    this._generator.signal(pageAlias, page.mainFrame(), { name: 'popup', popupAlias });
+    this._generator.signal(pageAlias, page.mainFrame(), { name: 'popup', popupAlias }, this._cursor);
   }
 
   private _onDownload(page: Page) {
     const pageAlias = this._pageAliases.get(page)!;
     ++this._lastDownloadOrdinal;
-    this._generator.signal(pageAlias, page.mainFrame(), { name: 'download', downloadAlias: this._lastDownloadOrdinal ? String(this._lastDownloadOrdinal) : '' });
+    this._generator.signal(pageAlias, page.mainFrame(), { name: 'download', downloadAlias: this._lastDownloadOrdinal ? String(this._lastDownloadOrdinal) : '' }, this._cursor);
   }
 
   private _onDialog(page: Page) {
     const pageAlias = this._pageAliases.get(page)!;
     ++this._lastDialogOrdinal;
-    this._generator.signal(pageAlias, page.mainFrame(), { name: 'dialog', dialogAlias: this._lastDialogOrdinal ? String(this._lastDialogOrdinal) : '' });
+    this._generator.signal(pageAlias, page.mainFrame(), { name: 'dialog', dialogAlias: this._lastDialogOrdinal ? String(this._lastDialogOrdinal) : '' }, this._cursor);
   }
 }
 

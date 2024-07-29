@@ -217,6 +217,57 @@ x-pw-tool-item.plus > x-div {
   clip-path: url(#icon-plus);
 }
 
+/* up-arrow **/
+x-pw-tool-item.up-arrow.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.up-arrow.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.up-arrow.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.up-arrow > x-div {
+  clip-path: url(#icon-up-arrow);
+}
+
+/* down-arrow **/
+x-pw-tool-item.down-arrow.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.down-arrow.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.down-arrow.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.down-arrow > x-div {
+  clip-path: url(#icon-down-arrow);
+}
+
+/* checkbox **/
+x-pw-tool-item.checkbox.active {
+  background-color: transparent;
+}
+
+x-pw-tool-item.checkbox.active:hover {
+  background-color: hsl(0, 0%, 86%);
+}
+
+x-pw-tool-item.checkbox.active > x-div {
+  background-color: #1fd6b1;
+}
+
+x-pw-tool-item.checkbox > x-div {
+  clip-path: url(#icon-checkbox);
+}
+
 /* undo **/
 x-pw-tool-item.undo.active {
   background-color: transparent;

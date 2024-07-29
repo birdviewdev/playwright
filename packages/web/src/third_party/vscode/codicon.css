@@ -212,7 +212,7 @@
 .codicon-dash:before { content: '\eacc'; }
 .codicon-dashboard:before { content: '\eacd'; }
 .codicon-database:before { content: '\eace'; }
-.codicon-debug-continue:before { content: '\eacf'; }
+.codicon-debug-up-arrow:before { content: '\eacf'; }
 .codicon-debug-disconnect:before { content: '\ead0'; }
 .codicon-debug-pause:before { content: '\ead1'; }
 .codicon-debug-restart:before { content: '\ead2'; }
@@ -246,6 +246,10 @@
 .codicon-file-symlink-file:before { content: '\eaee'; }
 .codicon-file-zip:before { content: '\eaef'; }
 .codicon-files:before { content: '\eaf0'; }
+.codicon-up-arrow:before { content: '↑'; }
+.codicon-down-arrow:before { content: '↓'; }
+.codicon-checkbox:before { content: '✓'; }
+
 .codicon-filter:before { content: '\eaf1'; }
 .codicon-flame:before { content: '\eaf2'; }
 .codicon-fold-down:before { content: '\eaf3'; }
@@ -411,7 +415,7 @@
 .codicon-debug-stackframe-focused:before { content: '\eb8b'; }
 .codicon-debug-breakpoint-unsupported:before { content: '\eb8c'; }
 .codicon-symbol-string:before { content: '\eb8d'; }
-.codicon-debug-reverse-continue:before { content: '\eb8e'; }
+.codicon-debug-reverse-up-arrow:before { content: '\eb8e'; }
 .codicon-debug-step-back:before { content: '\eb8f'; }
 .codicon-debug-restart-frame:before { content: '\eb90'; }
 .codicon-call-incoming:before { content: '\eb92'; }
@@ -495,7 +499,7 @@
 .codicon-debug-coverage:before { content: '\ebdd'; }
 .codicon-run-errors:before { content: '\ebde'; }
 .codicon-folder-library:before { content: '\ebdf'; }
-.codicon-debug-continue-small:before { content: '\ebe0'; }
+.codicon-debug-up-arrow-small:before { content: '\ebe0'; }
 .codicon-beaker-stop:before { content: '\ebe1'; }
 .codicon-graph-line:before { content: '\ebe2'; }
 .codicon-graph-scatter:before { content: '\ebe3'; }
