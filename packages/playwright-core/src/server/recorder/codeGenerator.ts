@@ -66,7 +66,7 @@ export class CodeGenerator extends EventEmitter {
 
   changeAction(actions: Action[]) {
     // @ts-ignore
-    this._actions = actions.map((newAction)=> newAction.signals && newAction.name !== 'closeTest' ? ({frame: {pageAlias: newAction.pageAlias, isMainFrame: true}, action: newAction} ): null).filter(Boolean)
+    this._actions = actions.map((newAction)=> newAction.signals ? ({frame: {pageAlias: newAction.pageAlias, isMainFrame: true}, action: newAction} ): null).filter(Boolean)
     this.emit('change')
   }
 
@@ -125,13 +125,18 @@ export class CodeGenerator extends EventEmitter {
           eraseLastAction = true;
       }
     }
-
+    
+    
     this._lastAction = actionInContext;
     this._currentAction = null;
     if (eraseLastAction) {
       this._actions.pop();
     }
-    this._actions.splice(cursor, 0, actionInContext);
+    
+    this._actions.splice(cursor - 1, 0, actionInContext);
+    if(this._lastAction && this._lastAction.action.name === 'openTest') {
+      this._actions.splice(cursor, 0, Object.assign({}, actionInContext, {action: {name: 'closeTest', signals:[]}}));
+    }
     this._actionHistories = []
     this.emit('change');
   }
@@ -184,18 +189,7 @@ export class CodeGenerator extends EventEmitter {
   generateStructure(languageGenerator: LanguageGenerator) {
     const header = languageGenerator.generateHeader(this._options);
     const footer = languageGenerator.generateFooter(this._options.saveStorage);
-    const actions = this._actions.reduce<ActionInContext[][]>((acc, target) => {
-      if (target.action.name === 'openTest') {
-        acc.push([target]);
-      } else {
-        acc[acc.length - 1].push(target);
-      }
-      return acc;
-      
-    }, [[]]).flatMap((v)=> v[0].action.name === 'openTest' ? [...v, {
-      frame: v[0].frame,
-      action: {name: 'closeTest', signals:[]}
-    } as ActionInContext]: v).map((v)=> languageGenerator.generateAction(v)).filter(Boolean)
+    const actions = this._actions.map((v)=> languageGenerator.generateAction(v)).filter(Boolean)
     
     const text = [header, ...actions, footer].join('\n');
     return { header, footer, actions, text };

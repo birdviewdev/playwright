@@ -30,6 +30,7 @@ export const Main: React.FC = ({}) => {
   window.playwrightSetMode = setMode;
   window.playwrightSetSources = setSources;
   window.playwrightSetPaused = setPaused;
+  console.log("window.playwrightSetCursor::", window.playwrightSetCursor);
   window.playwrightUpdateLogs = (callLogs) => {
     const newLog = new Map<string, CallLog>(log);
     for (const callLog of callLogs) {

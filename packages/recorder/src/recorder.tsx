@@ -252,8 +252,28 @@ export const Recorder: React.FC<RecorderProps> = ({
           }}
         ></ToolbarButton>
         <ToolbarButton
-          icon="debug-continue"
-          title="save"
+          icon="up-arrow"
+          title="Up-arrow"
+          onClick={() => {
+            window.dispatch({
+              event: "cursor",
+              params: { state: cursor - 1 },
+            });
+          }}
+        ></ToolbarButton>
+        <ToolbarButton
+          icon="down-arrow"
+          title="Down-arrow"
+          onClick={() => {
+            window.dispatch({
+              event: "cursor",
+              params: { state: cursor + 1 },
+            });
+          }}
+        ></ToolbarButton>
+        <ToolbarButton
+          icon="checkbox"
+          title="Checkbox"
           onClick={() => {
             window.dispatch({
               event: "edit",

@@ -148,7 +148,9 @@ export class Recorder implements InstrumentationListener {
       }
 
       if(data.event === 'cursor') {
-        // this._cursor = data.params.cursor
+        this._contextRecorder._cursor = data.params.state
+        this._recorderApp?.setCursor(data.params.state)
+        return;
       }
 
       if(data.event === 'edit') {
@@ -157,7 +159,6 @@ export class Recorder implements InstrumentationListener {
         
         this._contextRecorder.changeAction(newActions)
       }
-
     });
 
     await Promise.all([
@@ -175,24 +176,28 @@ export class Recorder implements InstrumentationListener {
     this._contextRecorder.on(ContextRecorder.Events.Change, (data: { sources: Source[], primaryFileName: string }) => {
       this._recorderSources = data.sources;
       
-        const source = data.sources.find((source)=> source.id === 'jsonl')
-
+      
       this._pushAllSources();
+      
+      const source = data.sources.find((source)=> source.id === 'jsonl')
 
-
-      if(source?.actions) {
+      if(source?.actions&& source?.actions.length >= 2) {
         const lastAction = JSON.parse(source?.actions[source?.actions?.length - 1])
-        
+        const lastPrevAction = JSON.parse(source?.actions[source?.actions?.length - 2])
+
         
         const headerLength = 1
 
-        let cursor = (source?.actions?.length || 1) + headerLength
-        if(lastAction.name === 'closeTest') {
+        if(lastAction.name === 'closeTest' && lastPrevAction.name === 'openTest') {
+          let cursor = (source?.actions?.length || 1) + headerLength
           cursor = cursor - 1;
+          this._contextRecorder._cursor = cursor
+          this._recorderApp?.setCursor(cursor)
+        } else {
+          this._contextRecorder._cursor = this._contextRecorder._cursor + 1
+          this._recorderApp?.setCursor(this._contextRecorder._cursor)
         }
 
-        this._contextRecorder._cursor = cursor
-        this._recorderApp?.setCursor(cursor)
       }
 
       this._recorderApp?.setFileIfNeeded(data.primaryFileName);
@@ -699,7 +704,6 @@ class ContextRecorder extends EventEmitter {
   }
 
   async changeAction(actions: actions.Action[]) {
-    console.log("actions::", actions)
     this._cursor = actions.length - 1
     return this._generator.changeAction(actions);
   }
@@ -714,7 +718,6 @@ class ContextRecorder extends EventEmitter {
       action
     };
     this._setCommittedAfterTimeout(actionInContext);
-    console.log("record this._cursor::", this._cursor)
     this._generator.addAction(actionInContext, this._cursor);
   }
 
