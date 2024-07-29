@@ -32,6 +32,7 @@ declare global {
   interface Window {
     playwrightSetFileIfNeeded: (file: string) => void;
     playwrightSetMode: (mode: Mode) => void;
+    playwrightSetCursor: (cursor: number) => void;
     playwrightSetPaused: (paused: boolean) => void;
     playwrightSetSources: (sources: Source[]) => void;
     playwrightSetOverlayVisible: (visible: boolean) => void;
@@ -46,6 +47,7 @@ export interface IRecorderApp extends EventEmitter {
   close(): Promise<void>;
   setPaused(paused: boolean): Promise<void>;
   setMode(mode: Mode): Promise<void>;
+  setCursor(cursor: number): Promise<void>;
   setFileIfNeeded(file: string): Promise<void>;
   setSelector(selector: string, userGesture?: boolean): Promise<void>;
   updateCallLogs(callLogs: CallLog[]): Promise<void>;
@@ -55,6 +57,7 @@ export interface IRecorderApp extends EventEmitter {
 export class EmptyRecorderApp extends EventEmitter implements IRecorderApp {
   async close(): Promise<void> {}
   async setPaused(paused: boolean): Promise<void> {}
+  async setCursor(cursor: number): Promise<void> {}
   async setMode(mode: Mode): Promise<void> {}
   async setFileIfNeeded(file: string): Promise<void> {}
   async setSelector(selector: string, userGesture?: boolean): Promise<void> {}
@@ -149,6 +152,12 @@ export class RecorderApp extends EventEmitter implements IRecorderApp {
     await this._page.mainFrame().evaluateExpression(((file: string) => {
       window.playwrightSetFileIfNeeded(file);
     }).toString(), { isFunction: true }, file).catch(() => {});
+  }
+
+  async setCursor (cursor: number): Promise<void>  {
+    await this._page.mainFrame().evaluateExpression(((cursor: number)=> {
+      window.playwrightSetCursor(cursor);
+    }).toString(), {isFunction: true}, cursor).catch(()=>{})
   }
 
   async setPaused(paused: boolean): Promise<void> {

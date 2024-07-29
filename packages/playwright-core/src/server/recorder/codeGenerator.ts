@@ -57,11 +57,11 @@ export class CodeGenerator extends EventEmitter {
     this._enabled = enabled;
   }
 
-  addAction(action: ActionInContext) {
+  addAction(action: ActionInContext, cursor: number) {
     if (!this._enabled)
       return;
     this.willPerformAction(action);
-    this.didPerformAction(action);
+    this.didPerformAction(action, cursor);
   }
 
   changeAction(actions: Action[]) {
@@ -96,7 +96,7 @@ export class CodeGenerator extends EventEmitter {
       this._currentAction = null;
   }
   
-  didPerformAction(actionInContext: ActionInContext) {
+  didPerformAction(actionInContext: ActionInContext, cursor: number) {
     if (!this._enabled)
       return;
     const action = actionInContext.action;
@@ -131,7 +131,7 @@ export class CodeGenerator extends EventEmitter {
     if (eraseLastAction) {
       this._actions.pop();
     }
-    this._actions.push(actionInContext);
+    this._actions.splice(cursor, 0, actionInContext);
     this._actionHistories = []
     this.emit('change');
   }
@@ -144,7 +144,7 @@ export class CodeGenerator extends EventEmitter {
       action.committed = true;
   }
 
-  signal(pageAlias: string, frame: Frame, signal: Signal) {
+  signal(pageAlias: string, frame: Frame, signal: Signal, cursor: number) {
     if (!this._enabled)
       return;
 
@@ -177,7 +177,7 @@ export class CodeGenerator extends EventEmitter {
           url: frame.url(),
           signals: [],
         },
-      });
+      }, cursor);
     }
   }
 

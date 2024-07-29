@@ -92,6 +92,7 @@ export type Source = {
 declare global {
   interface Window {
     playwrightSetMode: (mode: Mode) => void;
+    playwrightSetCursor: (cursor: number) => void;
     playwrightSetPaused: (paused: boolean) => void;
     playwrightSetSources: (sources: Source[]) => void;
     playwrightSetOverlayVisible: (visible: boolean) => void;
