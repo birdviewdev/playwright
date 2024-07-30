@@ -16,6 +16,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
+    "recorder": "node ./packages/playwright-core/cli.js codegen",
     "ctest": "playwright test --config=tests/library/playwright.config.ts --project=chromium-*",
     "ftest": "playwright test --config=tests/library/playwright.config.ts --project=firefox-*",
     "wtest": "playwright test --config=tests/library/playwright.config.ts --project=webkit-*",
